@@ -1,0 +1,1 @@
+This is the location for the composer.phar file assuming we can download it.
