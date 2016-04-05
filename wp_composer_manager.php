@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: WP Composer Manager
- * Plugin URI: https://github.com/aaronsaray/wp_composer_manager
- * Description: Manage composer for wordpress plugins.
+ * Plugin URI: https://github.com/aaronsaray/wp-composer-manager
+ * Description: Manage composer for WordPress plugins.
  * Author: Aaron Saray
  * Author URI: http://aaronsaray.com
  * Version: 0.1.0

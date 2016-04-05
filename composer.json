@@ -1,5 +1,5 @@
 {
-    "name": "aaronsaray/wp_composer_manager",
+    "name": "aaronsaray/wp-composer-manager",
     "description": "Manage WordPress Plugin Composer Dependencies",
     "authors": [
         {
