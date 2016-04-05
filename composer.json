@@ -1,0 +1,17 @@
+{
+    "name": "aaronsaray/wp_composer_manager",
+    "description": "Manage WordPress Plugin Composer Dependencies",
+    "authors": [
+        {
+            "name": "Aaron Saray",
+            "email": "aaron@aaronsaray.com"
+        }
+    ],
+    "require": {
+        "pimple/pimple": "^3.0",
+        "aura/view": "^2.2"
+    },
+    "autoload": {
+        "psr-4": {"AaronSaray\\WPComposerManager\\": "src"}
+    }
+}

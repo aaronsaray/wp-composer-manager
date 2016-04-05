@@ -7,6 +7,12 @@
 
 namespace AaronSaray\WPComposerManager;
 
+/** @var string the directory of the composer install */
+define('COMPOSER_BINARY_DIRECTORY', __DIR__ . '/bin');
+
+/** @var string the destination file of the composer install */
+define('COMPOSER_BINARY_DIRECTORY_FILE', COMPOSER_BINARY_DIRECTORY . '/composer.phar');
+
 /**
  * This shows the screen for the initial install
  */
@@ -22,6 +28,13 @@ function installer_screen()
             try {
                 composer_install();
                 $output .= "<p class='success-message'>Composer binary installed successfully.</p>";
+                try {
+                    plugin_composer_install();
+                    $output .= "<p class='success-message'>This plugin was successfully installed using composer.</p>";
+                }
+                catch (\Exception $e) {
+                    $output .= "<p class='error-message'>This plugin was not installed successfully: {$e->getMessage()}</p>";
+                }
             }
             catch (\Exception $e) {
                 $output .= "<p class='error-message'>Composer binary was not installed: {$e->getMessage()}</p>";
@@ -67,25 +80,39 @@ add_action('admin_menu', function () {
 
 /**
  * Install the binary of composer
+ *
+ * This will not try to reinstall it if it already exists
  */
 function composer_install()
 {
     $source = "https://getcomposer.org/composer.phar";
-    $destination = __DIR__ . '/bin';
 
-    if (!is_writable($destination)) {
-        throw new \Exception("We do not have permission to write to the directory {$destination}");
-    }
+    if (!file_exists(COMPOSER_BINARY_DIRECTORY_FILE)) {
+        if (!is_writable(COMPOSER_BINARY_DIRECTORY)) {
+            throw new \Exception("We do not have permission to write to the directory " . COMPOSER_BINARY_DIRECTORY);
+        }
 
-    if (!ini_get('allow_url_fopen')) {
-        throw new \Exception("We are unable to load items remotely.  Your php.ini setting of allow_url_fopen is set to false.");
-    }
-    
-    if (!($handle = fopen($source, 'r'))) {
-        throw new \Exception("We're unable to open the URL {$source}.  Could it be that you are not allowing outbound traffic from your server?");
-    }
+        if (!ini_get('allow_url_fopen')) {
+            throw new \Exception("We are unable to load items remotely.  Your php.ini setting of allow_url_fopen is set to false.");
+        }
 
-    if (!file_put_contents($destination . '/composer.phar', $handle)) {
-        throw new \Exception("We were unable to write the composer.phar file.");
+        if (!($handle = fopen($source, 'r'))) {
+            throw new \Exception("We're unable to open the URL {$source}.  Could it be that you are not allowing outbound traffic from your server?");
+        }
+
+        if (!file_put_contents(COMPOSER_BINARY_DIRECTORY_FILE, $handle)) {
+            throw new \Exception("We were unable to write the composer.phar file.");
+        }
     }
+}
+
+function plugin_composer_install()
+{
+    $workingDir = plugin_dir_path(__FILE__);
+    $command = sprintf('%s install -d %s', COMPOSER_BINARY_DIRECTORY_FILE, $workingDir);
+    $command = 'echo ' . $command;
+    $lastLine = exec($command, $output, $returnVar);
+    var_dump($output);
+    var_dump($returnVar);
+    var_dump($lastLine);
 }
