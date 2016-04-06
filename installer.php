@@ -26,7 +26,13 @@ class Installer
     {
         self::$COMPOSER_BINARY_DIRECTORY = __DIR__ . '/bin';
         self::$COMPOSER_BINARY_DIRECTORY_FILE = self::$COMPOSER_BINARY_DIRECTORY . '/composer.phar';
+    }
 
+    /**
+     * Run the installer
+     */
+    public function __invoke()
+    {
         /** register the menu and screen */
         add_action('admin_menu', function () {
             add_submenu_page(
@@ -42,7 +48,7 @@ class Installer
         /**
          * add a setting link so that it's easier to configure
          */
-        add_filter('plugin_action_links_' . plugin_basename(__DIR__ . '/wp-composer-manager.php'), function($links) {
+        add_filter('plugin_action_links_wp-composer-manager/wp-composer-manager.php', function($links) {
             $links['configure-first-run'] = sprintf(
                 '<a href="%s">%s</a>',
                 admin_url('plugins.php?page=composer-manager-install'),
@@ -170,18 +176,29 @@ class Installer
      */
     protected function pluginComposerInstall()
     {
-        $workingDir = plugin_dir_path(__FILE__);
-
-        $selfUpdateCommand = sprintf('COMPOSER_HOME=%s %s self-update -d %s 2>&1', self::$COMPOSER_BINARY_DIRECTORY, self::$COMPOSER_BINARY_DIRECTORY_FILE, $workingDir);
+        $selfUpdateCommand = sprintf('COMPOSER_HOME=%s %s self-update 2>&1', self::$COMPOSER_BINARY_DIRECTORY, self::$COMPOSER_BINARY_DIRECTORY_FILE);
         exec($selfUpdateCommand, $output, $returnVar);
         if ($returnVar !== 0) {
             throw new \Exception('Composer self-update failed with message: ' . implode(" ", $output));
         }
 
-        $selfUpdateCommand = sprintf('COMPOSER_HOME=%s %s install -d %s 2>&1', self::$COMPOSER_BINARY_DIRECTORY, self::$COMPOSER_BINARY_DIRECTORY_FILE, $workingDir);
-        exec($selfUpdateCommand, $output, $returnVar);
-        if ($returnVar !== 0) {
-            throw new \Exception('Composer install failed with message: ' . implode(" ", $output));
+        $vendorDirBase = WP_CONTENT_DIR;
+        if (!is_writable($vendorDirBase)) {
+            throw new \Exception('We are unable to write to the vendor folder: ' . $vendorDirBase);
+        }
+
+        $workingDir = plugin_dir_path(__FILE__);
+        $selfInstallCommand = sprintf(
+            'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s install -d %s 2>&1',
+            $vendorDirBase . '/vendor',
+            self::$COMPOSER_BINARY_DIRECTORY,
+            self::$COMPOSER_BINARY_DIRECTORY_FILE,
+            $workingDir
+        );
+
+        exec($selfInstallCommand, $outputInstall, $returnVarInstall);
+        if ($returnVarInstall !== 0) {
+            throw new \Exception('Composer install failed with message: ' . implode(" ", $outputInstall));
         }
     }
 }

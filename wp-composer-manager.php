@@ -15,5 +15,14 @@ if (!defined('ABSPATH')) {
     die('Please do not surf to this file directly.');
 }
 
-// no composer?
-require 'installer.php';
+$autoloadFile = WP_CONTENT_DIR . '/vendor/autoload.php';
+if (!file_exists($autoloadFile)) {
+    require 'installer.php';
+    $app = new \AaronSaray\WPComposerManager\Installer();
+}
+else {
+    require $autoloadFile;
+    $app = new \AaronSaray\WPComposerManager\App();
+}
+
+$app();
