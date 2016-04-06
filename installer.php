@@ -206,10 +206,6 @@ class Installer
     }
 }
 
-/**
- * Run installer
- */
-new Installer();
 
 
 
