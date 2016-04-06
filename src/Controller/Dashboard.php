@@ -7,6 +7,7 @@
 
 namespace AaronSaray\WPComposerManager\Controller;
 
+use AaronSaray\WPComposerManager\Service\LockFileReader;
 use Aura\View\View;
 
 /**
@@ -21,12 +22,19 @@ class Dashboard
     protected $view;
 
     /**
+     * @var LockFileReader
+     */
+    protected $lockFileReaderService;
+
+    /**
      * Dashboard constructor.
      * @param View $view
+     * @param LockFileReader $lockFileReaderService
      */
-    public function __construct(View $view)
+    public function __construct(View $view, LockFileReader $lockFileReaderService)
     {
         $this->view = $view;
+        $this->lockFileReaderService = $lockFileReaderService;
     }
 
     /**
@@ -35,7 +43,7 @@ class Dashboard
     public function __invoke()
     {
         $this->view->setView('dashboard');
-
+        $this->view->setData(array('packages' => $this->lockFileReaderService->getAllPackages()));
         $view = $this->view;
         echo $view();
     }

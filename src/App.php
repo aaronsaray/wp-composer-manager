@@ -7,6 +7,7 @@
 
 namespace AaronSaray\WPComposerManager;
 use AaronSaray\WPComposerManager\Controller;
+use AaronSaray\WPComposerManager\Service;
 
 /**
  * Class App
@@ -28,19 +29,21 @@ class App
     {
         $this->di = $di = new \Pimple\Container();
 
-        // View
         $di['view'] = function($di) {
             $factory = new \Aura\View\ViewFactory();
             $view = $factory->newInstance();
-
             $registry = $view->getViewRegistry();
             $registry->setPaths([__DIR__ . '/View']);
-
             return $view;
         };
 
+        $di['service.lock-file-reader'] = function() {
+            $lockFile = realpath(__DIR__ . '/..') . '/composer.lock'; // not sure if this is a good idea at the moment
+            return new Service\LockFileReader($lockFile);
+        };
+
         $di['controller.dashboard'] = function($di) {
-            return new Controller\Dashboard($di['view']);
+            return new Controller\Dashboard($di['view'], $di['service.lock-file-reader']);
         };
     }
 
