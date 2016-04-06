@@ -27,6 +27,7 @@
             </tr>
         </tfoot>
     </table>
+    <br>
     <hr>
     <h2><?= __('Plugins with composer.json files', 'wp-composer-manager') ?></h2>
     <p>These plugins have composer.json files in their root.</p>
@@ -34,18 +35,24 @@
         <thead>
         <tr>
             <th><?= __('Plugin Name', 'wp-composer-manager') ?></th>
+            <th><?= __('Description', 'wp-composer-manager') ?></th>
         </tr>
         </thead>
         <tbody>
         <?php
+        /** @var \AaronSaray\WPComposerManager\Model\Plugin $plugin */
         foreach ($this->plugins as $plugin) {
-
+            echo '<tr>';
+            echo '<td>' . esc_html($plugin->getName()) . '</td>';
+            echo '<td>' . esc_html($plugin->getDescription()) . '</td>';
+            echo '</tr>';
         }
         ?>
         </tbody>
         <tfoot>
         <tr>
             <th><?= __('Plugin Name', 'wp-composer-manager') ?></th>
+            <th><?= __('Description', 'wp-composer-manager') ?></th>
         </tr>
         </tfoot>
     </table>
