@@ -50,6 +50,13 @@ class Installer
             );
             return $links;
         });
+
+        /**
+         * Add jquery to help build a better user interface
+         */
+        add_action('admin_enqueue_scripts', function () {
+            wp_enqueue_script('jquery');
+        });
     }
 
     /**
@@ -98,11 +105,31 @@ class Installer
 
             $output .= "<p>";
             $output .= "<a href='plugins.php' class='button button-cancel alignright'>" . __("No Thanks - let's disable this plugin.", 'wp-composer-manager') . "</a>";
-            $output .= "<form method='post'>";
+            $output .= "<form method='post' id='wp-composer-manager-install-form'>";
             $output .= wp_nonce_field('wp-composer-manager-install');
             $output .= get_submit_button(__('OK - give it a shot!', 'wp-composer-manager'), 'primary large', 'submit', false);
             $output .= "</form>";
+            $output .= "</p><p>";
+            $output .= "<small>Just so you know, this could take a while depending on your server's internet connection.</small>";
             $output .= "</p>";
+
+            // the javascript for the button functions
+            $output .= "
+                <script>
+                (function($){
+                    $(function() {
+                        $('#wp-composer-manager-install-form').on('submit', function() {
+                            var f = $(this),
+                                b = $('input[type=submit]', f);
+                            b.attr('disabled', 'disabled').val('Please wait...');
+                            var i = $('<img />').css('height', '20px').css('width', '20px').css('marginLeft', '3px').css('marginTop', '5px')
+                                        .attr('src', '" . site_url('/wp-includes/images/spinner-2x.gif') . "');
+                            b.after(i);                           
+                        });
+                    });
+                }(jQuery)());
+                </script>
+            ";
         }
 
         $output .= "</div>";
@@ -144,13 +171,18 @@ class Installer
     protected function pluginComposerInstall()
     {
         $workingDir = plugin_dir_path(__FILE__);
-        $command = sprintf('%s install -d %s', self::$COMPOSER_BINARY_DIRECTORY_FILE, $workingDir);
-        //$command = sprintf('%s --version', self::$COMPOSER_BINARY_DIRECTORY_FILE);
-        $command = "echo $command";
-        $lastLine = exec($command, $output, $returnVar);
-        var_dump($output);
-        var_dump($returnVar);
-        var_dump($lastLine);
+
+        $selfUpdateCommand = sprintf('COMPOSER_HOME=%s %s self-update -d %s 2>&1', self::$COMPOSER_BINARY_DIRECTORY, self::$COMPOSER_BINARY_DIRECTORY_FILE, $workingDir);
+        exec($selfUpdateCommand, $output, $returnVar);
+        if ($returnVar !== 0) {
+            throw new \Exception('Composer self-update failed with message: ' . implode(" ", $output));
+        }
+
+        $selfUpdateCommand = sprintf('COMPOSER_HOME=%s %s install -d %s 2>&1', self::$COMPOSER_BINARY_DIRECTORY, self::$COMPOSER_BINARY_DIRECTORY_FILE, $workingDir);
+        exec($selfUpdateCommand, $output, $returnVar);
+        if ($returnVar !== 0) {
+            throw new \Exception('Composer install failed with message: ' . implode(" ", $output));
+        }
     }
 }
 

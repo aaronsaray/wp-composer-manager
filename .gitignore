@@ -1,2 +1,7 @@
 .idea
+
+bin/cache
+bin/.htaccess
 bin/composer.phar
+
+composer.lock
