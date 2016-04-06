@@ -7,6 +7,7 @@
  * Author URI: http://aaronsaray.com
  * Version: 0.1.0
  * License: GPLv3
+ * Text Domain: wp-composer-manager
  */
 
 if (!defined('ABSPATH')) {
