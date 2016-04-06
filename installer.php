@@ -1,6 +1,8 @@
 <?php
 /**
  * This is the code that is used before the composer set up is complete
+ * 
+ * Note - there really isn't any code reuse with this and the main plugin
  *
  * @author Aaron Saray
  */
@@ -85,6 +87,7 @@ class Installer
                     try {
                         $this->pluginComposerInstall();
                         $output .= "<p class='success-message'>" . __('This plugin was successfully installed using composer.', 'wp-composer-manager') . "</p>";
+                        $output .= "<p><a href='" . admin_url('plugins.php?page=composer-manager') . "'>" . __('Continue to Plugin Dashboard', 'wp-composer-manager') . "</a></p>";
                     }
                     catch (\Exception $e) {
                         $output .= "<p class='error-message'>" . sprintf(__('This plugin was not installed successfully: %s', 'wp-composer-manager'), $e->getMessage()) . "</p>";
