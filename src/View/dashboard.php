@@ -27,4 +27,26 @@
             </tr>
         </tfoot>
     </table>
+    <hr>
+    <h2><?= __('Plugins with composer.json files', 'wp-composer-manager') ?></h2>
+    <p>These plugins have composer.json files in their root.</p>
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+        <tr>
+            <th><?= __('Plugin Name', 'wp-composer-manager') ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        foreach ($this->plugins as $plugin) {
+
+        }
+        ?>
+        </tbody>
+        <tfoot>
+        <tr>
+            <th><?= __('Plugin Name', 'wp-composer-manager') ?></th>
+        </tr>
+        </tfoot>
+    </table>
 </div>

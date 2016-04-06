@@ -33,7 +33,7 @@ class App
             $factory = new \Aura\View\ViewFactory();
             $view = $factory->newInstance();
             $registry = $view->getViewRegistry();
-            $registry->setPaths([__DIR__ . '/View']);
+            $registry->setPaths(array(__DIR__ . '/View'));
             return $view;
         };
 
@@ -41,9 +41,12 @@ class App
             $lockFile = realpath(__DIR__ . '/..') . '/composer.lock'; // not sure if this is a good idea at the moment
             return new Service\LockFileReader($lockFile);
         };
+        $di['service.plugin-finder'] = function() {
+            return new Service\PluginFinder();
+        };
 
         $di['controller.dashboard'] = function($di) {
-            return new Controller\Dashboard($di['view'], $di['service.lock-file-reader']);
+            return new Controller\Dashboard($di['view'], $di['service.lock-file-reader'], $di['service.plugin-finder']);
         };
     }
 
