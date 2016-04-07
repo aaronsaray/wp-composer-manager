@@ -14,6 +14,11 @@ namespace AaronSaray\WPComposerManager\Model;
 class Plugin
 {
     /**
+     * @var string the path/slug for this plugin
+     */
+    protected $id;
+
+    /**
      * @var string the name of the plugin
      */
     protected $name;
@@ -22,6 +27,24 @@ class Plugin
      * @var string the description
      */
     protected $description;
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $id
+     * @return Plugin
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     /**
      * @return string

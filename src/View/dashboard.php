@@ -36,6 +36,7 @@
         <tr>
             <th><?= __('Plugin Name', 'wp-composer-manager') ?></th>
             <th><?= __('Description', 'wp-composer-manager') ?></th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -45,6 +46,7 @@
             echo '<tr>';
             echo '<td>' . esc_html($plugin->getName()) . '</td>';
             echo '<td>' . esc_html($plugin->getDescription()) . '</td>';
+            echo '<td><a href="plugins.php?page=composer-manager-composer-install&plugin=' . esc_html($plugin->getId()) . '">Composer Install</a></td>';
             echo '</tr>';
         }
         ?>
@@ -53,6 +55,7 @@
         <tr>
             <th><?= __('Plugin Name', 'wp-composer-manager') ?></th>
             <th><?= __('Description', 'wp-composer-manager') ?></th>
+            <th></th>
         </tr>
         </tfoot>
     </table>

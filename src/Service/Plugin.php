@@ -1,18 +1,18 @@
 <?php
 /**
- * Finds Plugins with composer json file
+ * Manages plugins
  *
  * @author Aaron Saray
  */
 
 namespace AaronSaray\WPComposerManager\Service;
-use AaronSaray\WPComposerManager\Model\Plugin;
+use AaronSaray\WPComposerManager\Model;
 
 /**
- * Class PluginFinder
+ * Class Plugin
  * @package AaronSaray\WPComposerManager\Service
  */
-class PluginFinder
+class Plugin
 {
     /**
      * @return array
@@ -24,11 +24,20 @@ class PluginFinder
         foreach (get_plugins() as $pluginFile => $pluginDetails) {
             $pluginDirectory = sprintf('%s/%s', WP_PLUGIN_DIR, plugin_dir_path($pluginFile));
             if (file_exists($pluginDirectory . 'composer.json')) {
-                $plugin = new Plugin();
-                $plugin->setName($pluginDetails['Name'])->setDescription($pluginDetails['Description']);
+                $plugin = new Model\Plugin();
+                $plugin->setId($pluginFile)->setName($pluginDetails['Name'])->setDescription($pluginDetails['Description']);
                 $plugins[] = $plugin;
             }
         }
         return $plugins;
+    }
+
+    /**
+     * @param $id string the id which is usually plugin-name/plugin-name.php
+     * @return boolean
+     */
+    public function doesPluginExistById($id)
+    {
+        return file_exists(WP_PLUGIN_DIR . '/' . $id);
     }
 }

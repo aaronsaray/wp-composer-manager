@@ -37,16 +37,18 @@ class App
             return $view;
         };
 
-        $di['service.lock-file-reader'] = function() {
-            $lockFile = realpath(__DIR__ . '/..') . '/composer.lock'; // not sure if this is a good idea at the moment
-            return new Service\LockFileReader($lockFile);
+        $di['service.composer'] = function() {
+            return new Service\Composer();
         };
-        $di['service.plugin-finder'] = function() {
-            return new Service\PluginFinder();
+        $di['service.plugin'] = function() {
+            return new Service\Plugin();
         };
 
         $di['controller.dashboard'] = function($di) {
-            return new Controller\Dashboard($di['view'], $di['service.lock-file-reader'], $di['service.plugin-finder']);
+            return new Controller\Dashboard($di['view'], $di['service.plugin'], $di['service.composer']);
+        };
+        $di['controller.composer-install'] = function($di) {
+            return new Controller\ComposerInstall($di['view'], $di['service.plugin'], $di['service.composer']);
         };
     }
 
@@ -55,15 +57,28 @@ class App
      */
     public function __invoke()
     {
+        $di = $this->di;
+
         /** register the menu and screen */
-        add_action('admin_menu', function () {
+        add_action('admin_menu', function () use ($di) {
+            /** main plugin page */
             add_submenu_page(
                 'plugins.php',
                 __('Composer Manager', 'wp-composer-manager'),
                 __('Composer Manager', 'wp-composer-manager'),
                 'manage_options',
                 'composer-manager',
-                $this->di['controller.dashboard']
+                $di['controller.dashboard']
+            );
+
+            /** composer install page */
+            add_submenu_page(
+                null,
+                __('Composer Install', 'wp-composer-manager'),
+                null,
+                'manage_options',
+                'composer-manager-composer-install',
+                $di['controller.composer-install']
             );
         });
 

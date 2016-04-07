@@ -7,53 +7,23 @@
 
 namespace AaronSaray\WPComposerManager\Controller;
 
-use AaronSaray\WPComposerManager\Service\LockFileReader;
-use AaronSaray\WPComposerManager\Service\PluginFinder;
-use Aura\View\View;
-
 /**
  * Class Dashboard
  * @package AaronSaray\WPComposerManager\Controller
  */
-class Dashboard
+class Dashboard extends ControllerAbstract
 {
-    /**
-     * @var View
-     */
-    protected $view;
-
-    /**
-     * @var LockFileReader
-     */
-    protected $lockFileReaderService;
-
-    /**
-     * @var PluginFinder
-     */
-    protected $pluginFinderService;
-
-    /**
-     * Dashboard constructor.
-     * @param View $view
-     * @param LockFileReader $lockFileReaderService
-     * @param PluginFinder $pluginFinderService
-     */
-    public function __construct(View $view, LockFileReader $lockFileReaderService, PluginFinder $pluginFinderService)
-    {
-        $this->view = $view;
-        $this->lockFileReaderService = $lockFileReaderService;
-        $this->pluginFinderService = $pluginFinderService;
-    }
-
     /**
      * Run the controller
      */
     public function __invoke()
     {
+        $lockFile = realpath(__DIR__ . '/../..') . '/composer.lock'; // not sure if this is a good idea at the moment
+
         $this->view->setView('dashboard');
         $this->view->setData(array(
-            'packages' => $this->lockFileReaderService->getAllPackages(),
-            'plugins'   =>  $this->pluginFinderService->findAllWithComposerJson()
+            'packages' => $this->composerService->getAllPackagesFromLockFile($lockFile),
+            'plugins'   =>  $this->pluginService->findAllWithComposerJson()
         ));
         $view = $this->view;
         echo $view();
