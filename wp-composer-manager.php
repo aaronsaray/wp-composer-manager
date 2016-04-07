@@ -15,15 +15,20 @@ if (!defined('ABSPATH')) {
     die('Please do not surf to this file directly.');
 }
 
-$autoloadFile = WP_CONTENT_DIR . '/vendor/autoload.php';
-if (!file_exists($autoloadFile)) {
-    require __DIR__ . '/src/Service/Composer.php';
-    require 'installer.php';
-    $app = new \AaronSaray\WPComposerManager\Installer(new \AaronSaray\WPComposerManager\Service\Composer());
-}
-else {
-    require $autoloadFile;
-    $app = new \AaronSaray\WPComposerManager\App();
-}
+/** this is done so we can see if vendor is available for autoload */
+set_include_path(get_include_path() . PATH_SEPARATOR . WP_CONTENT_DIR);
 
-$app();
+/** necessary because we want to set a good example */
+add_action('plugins_loaded', function() {
+    if (stream_resolve_include_path('vendor/autoload.php')) {
+        require 'vendor/autoload.php';
+        $app = new \AaronSaray\WPComposerManager\App();
+    }
+    else {
+        require __DIR__ . '/src/Service/Composer.php';
+        require 'installer.php';
+        $app = new \AaronSaray\WPComposerManager\Installer(new \AaronSaray\WPComposerManager\Service\Composer());
+    }
+
+    $app();
+});
