@@ -18,22 +18,32 @@ class ComposerInstall extends ControllerAbstract
      */
     public function __invoke()
     {
-        $plugin = $this->getGet('plugin');
+        $pluginId = $this->getGet('plugin');
 
-        if (empty($plugin)) {
+        if (empty($pluginId)) {
             die(wp_redirect('plugins.php?page=composer-manager'));
         }
 
         $errors = array();
-        
-        if (!$this->pluginService->doesPluginExistById($plugin)) {
-            $errors[] = __('The plugin file does not exist.', 'wp-composer-manager');
-        }
-        elseif (!$this->composerService->getComposerJsonFileFromPluginId($plugin)) {
-            $errors[] = __('The composer.json file was not found.', 'wp-composer-manager');
-        }
-        
+        $plugin = null;
+        $composerOutput = array();
 
-        var_dump($errors);
+        try {
+            $plugin = $this->pluginService->getPluginById($pluginId);
+            $this->composerService->getComposerJsonFileFromPluginId($pluginId);
+            $composerOutput = $this->composerService->runComposerInstallForPlugin($plugin);
+        }
+        catch (\Exception $e) {
+            $errors[] = $e->getMessage();
+        }
+
+        $this->view->setView('composer-install-results');
+        $this->view->setData(array(
+            'plugin'    =>  $plugin,
+            'errors' => $errors,
+            'composerOutput'    =>  $composerOutput
+        ));
+        $view = $this->view;
+        echo $view();
     }
 }

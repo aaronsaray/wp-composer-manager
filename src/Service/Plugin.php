@@ -33,11 +33,20 @@ class Plugin
     }
 
     /**
-     * @param $id string the id which is usually plugin-name/plugin-name.php
-     * @return boolean
+     * @param $id
+     * @return Model\Plugin
+     * @throws \Exception
      */
-    public function doesPluginExistById($id)
+    public function getPluginById($id)
     {
-        return file_exists(WP_PLUGIN_DIR . '/' . $id);
+        $pluginFile = sprintf('%s/%s', WP_PLUGIN_DIR, $id);
+        if (!file_exists($pluginFile)) {
+            throw new \Exception('The plugin ' . $pluginFile . ' does not exist.');
+        }
+
+        $pluginDetails = get_plugin_data($pluginFile);
+        $plugin = new Model\Plugin();
+        $plugin->setId($id)->setName($pluginDetails['Name'])->setDescription($pluginDetails['Description']);
+        return $plugin;
     }
 }

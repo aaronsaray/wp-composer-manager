@@ -81,5 +81,12 @@ class Plugin
         $this->description = $description;
         return $this;
     }
-       
+
+    /**
+     * @return string the plugin directory
+     */
+    public function getPluginDirectory()
+    {
+        return sprintf('%s/%s', WP_PLUGIN_DIR, dirname($this->id));
+    }
 }

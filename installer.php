@@ -67,8 +67,6 @@ class Installer
      */
     public function installerScreen()
     {
-        set_time_limit(0);
-        
         $output = "<div class='wrap'><h1>" . __('Composer Manager', 'wp-composer-manager') . "</h1>";
 
         if (isset($_POST['_wpnonce'])) {
