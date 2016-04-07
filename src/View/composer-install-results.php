@@ -3,7 +3,7 @@
     <hr>
     <h2>
         <?php
-        echo __('Run Composer Install on Plugin', 'wp-composer-manager');
+        echo __('Run Composer Update on Plugin', 'wp-composer-manager');
         if (!empty($this->plugin)) {
             echo " " . esc_html($this->plugin->getName());
         }
@@ -19,8 +19,8 @@
         echo '</ul>';
     }
     else {
-        echo '<p class="success-message">The <code>composer install</code> function was successful.</p>';
-        echo '<pre>' . implode("\n", $this->composerOutput) . '</pre>';
+        echo '<p class="success-message">The <code>composer update</code> function was successful.</p>';
+        echo '<pre style="overflow-x: auto">' . implode("\n", $this->composerOutput) . '</pre>';
     }
     ?>
     <a href="plugins.php?page=composer-manager" class="button button-primary">Back to Plugin Dashboard</a>

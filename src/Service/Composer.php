@@ -82,25 +82,21 @@ class Composer
      */
     public function runComposerUpdateForPlugin(Model\Plugin $plugin)
     {
-        $baseComposerJson = json_decode(file_get_contents(self::$COMPOSER_DIRECTORY . '/composer.json'), true);
-        $pluginComposerJson = json_decode(file_get_contents($this->getComposerJsonFileFromPluginId($plugin->getId())), true);
+        $baseComposerJsonArray = json_decode(file_get_contents(self::$COMPOSER_DIRECTORY . '/composer.json'), true);
+        $pluginComposerJsonArray = json_decode(file_get_contents($this->getComposerJsonFileFromPluginId($plugin->getId())), true);
 
-        if (isset($pluginComposerJson['autoload']['psr-4'])) {
-            foreach ($pluginComposerJson['autoload']['psr-4'] as $namespace => $value) {
-                $pluginComposerJson['autoload']['psr-4'][$namespace] = sprintf('../plugins/%s/%s', dirname($plugin->getId()), $value);
-            }
+        $baseComposerJsonArray = $this->mergeAutoload($baseComposerJsonArray, $pluginComposerJsonArray, $plugin);
+        $baseComposerJsonArray = $this->mergeRequire($baseComposerJsonArray, $pluginComposerJsonArray);
 
-            if (!isset($baseComposerJson['autoload']['psr-4'])) $baseComposerJson['autoload']['psr-4'] = array();
-            $baseComposerJson['autoload']['psr-4'] = array_merge($baseComposerJson['autoload']['psr-4'], $pluginComposerJson['autoload']['psr-4']);
-        }
 
         if (!defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 128); // does nothing though...
-        if (!file_put_contents(self::$COMPOSER_DIRECTORY . '/composer.json', json_encode($baseComposerJson, JSON_PRETTY_PRINT))) {
+        if (!defined('JSON_UNESCAPED_SLASHES')) define('JSON_UNESCAPED_SLASHES', 64);
+        if (!file_put_contents(self::$COMPOSER_DIRECTORY . '/composer.json', json_encode($baseComposerJsonArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))) {
             throw new \Exception('Unable to write merged composer.json file.');
         }
 
         $installCommand = sprintf(
-            'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s install -d %s 2>&1',
+            'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s update -d %s 2>&1',
             self::$COMPOSER_VENDOR_DIRECTORY,
             self::$COMPOSER_DIRECTORY,
             self::$COMPOSER_BINARY,
@@ -113,5 +109,44 @@ class Composer
         }
 
         return $outputInstall;
+    }
+
+    /**
+     * @param $baseComposerJsonArray
+     * @param $pluginComposerJsonArray
+     * @param Model\Plugin $plugin
+     * @return array
+     */
+    protected function mergeAutoload($baseComposerJsonArray, $pluginComposerJsonArray, Model\Plugin $plugin)
+    {
+        if (isset($pluginComposerJsonArray['autoload']['psr-4'])) {
+            foreach ($pluginComposerJsonArray['autoload']['psr-4'] as $namespace => $value) {
+                $pluginComposerJsonArray['autoload']['psr-4'][$namespace] = sprintf('../plugins/%s/%s', dirname($plugin->getId()), $value);
+            }
+
+            if (!isset($baseComposerJsonArray['autoload']['psr-4'])) $baseComposerJsonArray['autoload']['psr-4'] = array();
+            $baseComposerJsonArray['autoload']['psr-4'] = array_merge($baseComposerJsonArray['autoload']['psr-4'], $pluginComposerJsonArray['autoload']['psr-4']);
+        }
+
+        return $baseComposerJsonArray;
+    }
+
+    /**
+     * Merge in required
+     *
+     * @note this fails if the values are not matching - which needs to be addressed
+     *
+     * @param $baseComposerJsonArray
+     * @param $pluginComposerJsonArray
+     * @return mixed
+     */
+    protected function mergeRequire($baseComposerJsonArray, $pluginComposerJsonArray)
+    {
+        if (isset($pluginComposerJsonArray['require'])) {
+            if (!isset($baseComposerJsonArray['require'])) $baseComposerJsonArray['require'] = array(); //should never happen
+            $baseComposerJsonArray['require'] = array_merge($baseComposerJsonArray['require'], $pluginComposerJsonArray['require']);
+        }
+
+        return $baseComposerJsonArray;
     }
 }
