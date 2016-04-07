@@ -46,7 +46,7 @@
             echo '<tr>';
             echo '<td>' . esc_html($plugin->getName()) . '</td>';
             echo '<td>' . esc_html($plugin->getDescription()) . '</td>';
-            echo '<td><a href="plugins.php?page=composer-manager-composer-install&plugin=' . esc_html($plugin->getId()) . '">Composer Install</a></td>';
+            echo '<td><a href="plugins.php?page=composer-manager-composer-install&plugin=' . esc_html($plugin->getId()) . '">Composer Update</a></td>';
             echo '</tr>';
         }
         ?>

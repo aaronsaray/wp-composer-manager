@@ -74,13 +74,13 @@ class Composer
     }
 
     /**
-     * Runs the composer install process, returns an array on success of the output
+     * Runs the composer update process, returns an array on success of the output
      *
      * @param Model\Plugin $plugin
      * @return mixed
      * @throws \Exception
      */
-    public function runComposerInstallForPlugin(Model\Plugin $plugin)
+    public function runComposerUpdateForPlugin(Model\Plugin $plugin)
     {
         // copy composer.lock file to the plugin dir
         // run composer install
@@ -90,7 +90,7 @@ class Composer
         }
 
         $installCommand = sprintf(
-            'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s install -d %s 2>&1',
+            'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s update -d %s 2>&1',
             self::$COMPOSER_VENDOR_DIRECTORY,
             self::$COMPOSER_DIRECTORY,
             self::$COMPOSER_BINARY,

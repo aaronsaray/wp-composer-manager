@@ -31,7 +31,7 @@ class ComposerInstall extends ControllerAbstract
         try {
             $plugin = $this->pluginService->getPluginById($pluginId);
             $this->composerService->getComposerJsonFileFromPluginId($pluginId);
-            $composerOutput = $this->composerService->runComposerInstallForPlugin($plugin);
+            $composerOutput = $this->composerService->runComposerUpdateForPlugin($plugin);
         }
         catch (\Exception $e) {
             $errors[] = $e->getMessage();
