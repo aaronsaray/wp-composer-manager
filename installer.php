@@ -205,6 +205,12 @@ class Installer
         if (!rename($workingDir . '/composer.lock', $composer::$COMPOSER_LOCK_FILE)) {
             throw new \Exception('Unable to move the composer.lock file after finishing installation.');
         }
+
+        $autoloaders = array('autoload' => array('psr-4'=>array("AaronSaray\\WPComposerManager\\"=>"src")));
+        $autoloadersJson = json_encode($autoloaders);
+        if (!file_put_contents($composer::$COMPOSER_MERGE_JSON_FILE, $autoloadersJson)) {
+            throw new \Exception('Unable to write composer-merge.json file.');
+        }
     }
 }
 

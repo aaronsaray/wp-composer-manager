@@ -1,3 +1,4 @@
 .idea
 
 composer/*
+!composer/README.md

@@ -23,6 +23,9 @@ class Composer
 
     /** @var string the composer lock file */
     public static $COMPOSER_LOCK_FILE;
+
+    /** @var string the path for the merge file */
+    public static $COMPOSER_MERGE_JSON_FILE;
     
     /** @var string the composer vendor directory */
     public static $COMPOSER_VENDOR_DIRECTORY;
@@ -35,6 +38,7 @@ class Composer
         self::$COMPOSER_DIRECTORY = realpath(__DIR__ . '/../../composer');
         self::$COMPOSER_BINARY = self::$COMPOSER_DIRECTORY . '/composer.phar';
         self::$COMPOSER_LOCK_FILE = self::$COMPOSER_DIRECTORY . '/composer.lock';
+        self::$COMPOSER_MERGE_JSON_FILE = self::$COMPOSER_DIRECTORY . '/composer-merge.json';
         self::$COMPOSER_VENDOR_DIRECTORY = WP_CONTENT_DIR . '/vendor';
     }
 
