@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 /** this is done so we can see if vendor is available for autoload */
-set_include_path(get_include_path() . PATH_SEPARATOR . WP_CONTENT_DIR);
+set_include_path(get_include_path() . PATH_SEPARATOR . WP_CONTENT_DIR . '/composer');
 
 /** necessary because we want to set a good example */
 add_action('plugins_loaded', function() {

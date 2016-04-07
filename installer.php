@@ -152,8 +152,8 @@ class Installer
         $source = "https://getcomposer.org/composer.phar";
 
         if (!file_exists($composer::$COMPOSER_BINARY)) {
-            if (!is_writable($composer::$COMPOSER_DIRECTORY)) {
-                throw new \Exception("We do not have permission to write to the directory " . $composer::$COMPOSER_DIRECTORY);
+            if (!mkdir($composer::$COMPOSER_DIRECTORY)) {
+                throw new \Exception("We were unable to create directory " . $composer::$COMPOSER_DIRECTORY);
             }
 
             if (!ini_get('allow_url_fopen')) {
@@ -183,33 +183,23 @@ class Installer
             throw new \Exception('Composer self-update failed with message: ' . implode(" ", $output));
         }
 
-        $vendorDirBase = WP_CONTENT_DIR;
-        if (!is_writable($vendorDirBase)) {
-            throw new \Exception('We are unable to write to the vendor folder: ' . $vendorDirBase);
+        $composerJson = json_decode(file_get_contents(plugin_dir_path(__FILE__) . '/composer.json'), true);
+        $composerJson['autoload']['psr-4']['AaronSaray\\WPComposerManager\\'] = '../plugins/wp-composer-manager/src';  // necessary to handle these things via the plugin
+        if (!file_put_contents($composer::$COMPOSER_DIRECTORY . '/composer.json', json_encode($composerJson))) {
+            throw new \Exception('We were unable to write the new plugin composer.json to the composer working directory.');
         }
 
-        $workingDir = plugin_dir_path(__FILE__);
         $selfInstallCommand = sprintf(
             'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s install -d %s 2>&1',
-            $vendorDirBase . '/vendor',
+            $composer::$COMPOSER_VENDOR_DIRECTORY,
             $composer::$COMPOSER_DIRECTORY,
             $composer::$COMPOSER_BINARY,
-            $workingDir
+            $composer::$COMPOSER_DIRECTORY
         );
 
         exec($selfInstallCommand, $outputInstall, $returnVarInstall);
         if ($returnVarInstall !== 0) {
             throw new \Exception('Composer install failed with message: ' . implode(" ", $outputInstall));
-        }
-
-        if (!rename($workingDir . '/composer.lock', $composer::$COMPOSER_LOCK_FILE)) {
-            throw new \Exception('Unable to move the composer.lock file after finishing installation.');
-        }
-
-        $autoloaders = array('autoload' => array('psr-4'=>array("AaronSaray\\WPComposerManager\\"=>"src")));
-        $autoloadersJson = json_encode($autoloaders);
-        if (!file_put_contents($composer::$COMPOSER_MERGE_JSON_FILE, $autoloadersJson)) {
-            throw new \Exception('Unable to write composer-merge.json file.');
         }
     }
 }

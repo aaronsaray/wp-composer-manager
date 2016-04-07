@@ -21,25 +21,21 @@ class Composer
     /** @var string the destination file of the composer install */
     public static $COMPOSER_BINARY;
 
-    /** @var string the composer lock file */
-    public static $COMPOSER_LOCK_FILE;
-
-    /** @var string the path for the merge file */
-    public static $COMPOSER_MERGE_JSON_FILE;
-    
     /** @var string the composer vendor directory */
     public static $COMPOSER_VENDOR_DIRECTORY;
+
+    /** @var string the lock file */
+    public static $COMPOSER_LOCK_FILE;
 
     /**
      * Installer constructor.
      */
     public function __construct()
     {
-        self::$COMPOSER_DIRECTORY = realpath(__DIR__ . '/../../composer');
+        self::$COMPOSER_DIRECTORY = WP_CONTENT_DIR . '/composer';
         self::$COMPOSER_BINARY = self::$COMPOSER_DIRECTORY . '/composer.phar';
+        self::$COMPOSER_VENDOR_DIRECTORY = self::$COMPOSER_DIRECTORY . '/vendor';
         self::$COMPOSER_LOCK_FILE = self::$COMPOSER_DIRECTORY . '/composer.lock';
-        self::$COMPOSER_MERGE_JSON_FILE = self::$COMPOSER_DIRECTORY . '/composer-merge.json';
-        self::$COMPOSER_VENDOR_DIRECTORY = WP_CONTENT_DIR . '/vendor';
     }
 
     /**
@@ -86,27 +82,30 @@ class Composer
      */
     public function runComposerUpdateForPlugin(Model\Plugin $plugin)
     {
-        if (!copy(self::$COMPOSER_LOCK_FILE, $plugin->getPluginDirectory() . '/composer.lock')) {
-            throw new \Exception('Unable to copy composer.lock file to plugin dir ' . $plugin->getPluginDirectory());
-        }
-
-        $installCommand = sprintf(
-            'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s update -d %s 2>&1',
-            self::$COMPOSER_VENDOR_DIRECTORY,
-            self::$COMPOSER_DIRECTORY,
-            self::$COMPOSER_BINARY,
-            $plugin->getPluginDirectory()
-        );
-
-        exec($installCommand, $outputInstall, $returnVarInstall);
-        if ($returnVarInstall !== 0) {
-            throw new \Exception('Composer install failed with message: ' . implode(" ", $outputInstall));
-        }
-
-        if (!rename($plugin->getPluginDirectory() . '/composer.lock', self::$COMPOSER_LOCK_FILE)) {
-            throw new \Exception('Unable to move the composer.lock file after finishing installation.');
-        }
-        
-        return $outputInstall;
+        return true;
+//        if (!copy(self::$COMPOSER_LOCK_FILE, $plugin->getPluginDirectory() . '/composer.lock')) {
+//            throw new \Exception('Unable to copy composer.lock file to plugin dir ' . $plugin->getPluginDirectory());
+//        }
+//
+//        // need to do the merging here
+//
+//        $installCommand = sprintf(
+//            'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s update -d %s 2>&1',
+//            self::$COMPOSER_VENDOR_DIRECTORY,
+//            self::$COMPOSER_DIRECTORY,
+//            self::$COMPOSER_BINARY,
+//            $plugin->getPluginDirectory()
+//        );
+//
+//        exec($installCommand, $outputInstall, $returnVarInstall);
+//        if ($returnVarInstall !== 0) {
+//            throw new \Exception('Composer install failed with message: ' . implode(" ", $outputInstall));
+//        }
+//
+//        if (!rename($plugin->getPluginDirectory() . '/composer.lock', self::$COMPOSER_LOCK_FILE)) {
+//            throw new \Exception('Unable to move the composer.lock file after finishing installation.');
+//        }
+//
+//        return $outputInstall;
     }
 }
