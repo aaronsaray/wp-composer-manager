@@ -15,16 +15,34 @@ use AaronSaray\WPComposerManager\Model\Package;
  */
 class Composer
 {
+    /** @var string the directory of the composer install */
+    public static $COMPOSER_DIRECTORY;
+
+    /** @var string the destination file of the composer install */
+    public static $COMPOSER_BINARY;
+
+    /** @var  string the composer lock file */
+    public static $COMPOSER_LOCK_FILE;
+
     /**
-     * @param $lockFile string location of lock file
+     * Installer constructor.
+     */
+    public function __construct()
+    {
+        self::$COMPOSER_DIRECTORY = realpath(__DIR__ . '/../../composer');
+        self::$COMPOSER_BINARY = self::$COMPOSER_DIRECTORY . '/composer.phar';
+        self::$COMPOSER_LOCK_FILE = self::$COMPOSER_DIRECTORY . '/composer.lock';
+    }
+
+    /**
      * @return array of all packages
      */
-    public function getAllPackagesFromLockFile($lockFile)
+    public function getAllPackagesFromLockFile()
     {
         $packages = array();
 
-        if (is_readable($lockFile)) {
-            $jsonLockFile = json_decode(file_get_contents($lockFile));
+        if (is_readable(self::$COMPOSER_LOCK_FILE)) {
+            $jsonLockFile = json_decode(file_get_contents(self::$COMPOSER_LOCK_FILE));
             foreach ($jsonLockFile->packages as $packageObject) {
                 $package = new Package();
                 $package->setName($packageObject->name)->setVersion($packageObject->version);

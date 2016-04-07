@@ -17,8 +17,9 @@ if (!defined('ABSPATH')) {
 
 $autoloadFile = WP_CONTENT_DIR . '/vendor/autoload.php';
 if (!file_exists($autoloadFile)) {
+    require __DIR__ . '/src/Service/Composer.php';
     require 'installer.php';
-    $app = new \AaronSaray\WPComposerManager\Installer();
+    $app = new \AaronSaray\WPComposerManager\Installer(new \AaronSaray\WPComposerManager\Service\Composer());
 }
 else {
     require $autoloadFile;

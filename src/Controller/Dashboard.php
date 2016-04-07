@@ -18,11 +18,9 @@ class Dashboard extends ControllerAbstract
      */
     public function __invoke()
     {
-        $lockFile = realpath(__DIR__ . '/../..') . '/composer.lock'; // not sure if this is a good idea at the moment
-
         $this->view->setView('dashboard');
         $this->view->setData(array(
-            'packages' => $this->composerService->getAllPackagesFromLockFile($lockFile),
+            'packages' => $this->composerService->getAllPackagesFromLockFile(),
             'plugins'   =>  $this->pluginService->findAllWithComposerJson()
         ));
         $view = $this->view;

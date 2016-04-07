@@ -1,13 +1,12 @@
 <?php
 /**
  * This is the code that is used before the composer set up is complete
- * 
- * Note - there really isn't any code reuse with this and the main plugin
  *
  * @author Aaron Saray
  */
 
 namespace AaronSaray\WPComposerManager;
+use AaronSaray\WPComposerManager\Service\Composer;
 
 /**
  * Class Installer
@@ -15,19 +14,13 @@ namespace AaronSaray\WPComposerManager;
  */
 class Installer
 {
-    /** @var string the directory of the composer install */
-    protected static $COMPOSER_BINARY_DIRECTORY;
-
-    /** @var string the destination file of the composer install */
-    protected static $COMPOSER_BINARY_DIRECTORY_FILE;
-
     /**
      * Installer constructor.
+     * @param Composer $composerService
      */
-    public function __construct()
+    public function __construct(Composer $composerService)
     {
-        self::$COMPOSER_BINARY_DIRECTORY = __DIR__ . '/bin';
-        self::$COMPOSER_BINARY_DIRECTORY_FILE = self::$COMPOSER_BINARY_DIRECTORY . '/composer.phar';
+        $this->composerService = $composerService;
     }
 
     /**
@@ -35,15 +28,17 @@ class Installer
      */
     public function __invoke()
     {
+        $that = $this;
+
         /** register the menu and screen */
-        add_action('admin_menu', function () {
+        add_action('admin_menu', function () use ($that) {
             add_submenu_page(
                 'plugins.php',
                 __('Install Composer Manager', 'wp-composer-manager'),
                 __('Composer Manager', 'wp-composer-manager'),
                 'manage_options',
                 'composer-manager-install',
-                array($this, 'installerScreen')
+                array($that, 'installerScreen')
             );
         });
 
@@ -72,6 +67,8 @@ class Installer
      */
     public function installerScreen()
     {
+        set_time_limit(0);
+        
         $output = "<div class='wrap'><h1>" . __('Composer Manager', 'wp-composer-manager') . "</h1>";
 
         if (isset($_POST['_wpnonce'])) {
@@ -153,11 +150,12 @@ class Installer
      */
     protected function composerInstall()
     {
+        $composer = $this->composerService;
         $source = "https://getcomposer.org/composer.phar";
 
-        if (!file_exists(self::$COMPOSER_BINARY_DIRECTORY_FILE)) {
-            if (!is_writable(self::$COMPOSER_BINARY_DIRECTORY)) {
-                throw new \Exception("We do not have permission to write to the directory " . self::$COMPOSER_BINARY_DIRECTORY);
+        if (!file_exists($composer::$COMPOSER_BINARY)) {
+            if (!is_writable($composer::$COMPOSER_DIRECTORY)) {
+                throw new \Exception("We do not have permission to write to the directory " . $composer::$COMPOSER_DIRECTORY);
             }
 
             if (!ini_get('allow_url_fopen')) {
@@ -168,7 +166,7 @@ class Installer
                 throw new \Exception("We're unable to open the URL {$source}.  Could it be that you are not allowing outbound traffic from your server?");
             }
 
-            if (!file_put_contents(self::$COMPOSER_BINARY_DIRECTORY_FILE, $handle)) {
+            if (!file_put_contents($composer::$COMPOSER_BINARY, $handle)) {
                 throw new \Exception("We were unable to write the composer.phar file.");
             }
         }
@@ -179,7 +177,9 @@ class Installer
      */
     protected function pluginComposerInstall()
     {
-        $selfUpdateCommand = sprintf('COMPOSER_HOME=%s %s self-update 2>&1', self::$COMPOSER_BINARY_DIRECTORY, self::$COMPOSER_BINARY_DIRECTORY_FILE);
+        $composer = $this->composerService;
+
+        $selfUpdateCommand = sprintf('COMPOSER_HOME=%s %s self-update 2>&1', $composer::$COMPOSER_DIRECTORY, $composer::$COMPOSER_BINARY);
         exec($selfUpdateCommand, $output, $returnVar);
         if ($returnVar !== 0) {
             throw new \Exception('Composer self-update failed with message: ' . implode(" ", $output));
@@ -194,14 +194,18 @@ class Installer
         $selfInstallCommand = sprintf(
             'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s install -d %s 2>&1',
             $vendorDirBase . '/vendor',
-            self::$COMPOSER_BINARY_DIRECTORY,
-            self::$COMPOSER_BINARY_DIRECTORY_FILE,
+            $composer::$COMPOSER_DIRECTORY,
+            $composer::$COMPOSER_BINARY,
             $workingDir
         );
 
         exec($selfInstallCommand, $outputInstall, $returnVarInstall);
         if ($returnVarInstall !== 0) {
             throw new \Exception('Composer install failed with message: ' . implode(" ", $outputInstall));
+        }
+
+        if (!rename($workingDir . '/composer.lock', $composer::$COMPOSER_LOCK_FILE)) {
+            throw new \Exception('Unable to move the composer.lock file after finishing installation.');
         }
     }
 }
