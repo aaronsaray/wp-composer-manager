@@ -93,5 +93,12 @@ class App
             );
             return $links;
         });
+
+        /**
+         * Add jquery to help build a better user interface
+         */
+        add_action('admin_enqueue_scripts', function () {
+            wp_enqueue_script('jquery');
+        });
     }
 }

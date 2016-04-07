@@ -46,7 +46,7 @@
             echo '<tr>';
             echo '<td>' . esc_html($plugin->getName()) . '</td>';
             echo '<td>' . esc_html($plugin->getDescription()) . '</td>';
-            echo '<td><a href="plugins.php?page=composer-manager-composer-install&plugin=' . esc_html($plugin->getId()) . '">Composer Update</a></td>';
+            echo '<td><a class="composer-update-link" href="plugins.php?page=composer-manager-composer-install&plugin=' . esc_html($plugin->getId()) . '">Composer Update</a></td>';
             echo '</tr>';
         }
         ?>
@@ -60,3 +60,17 @@
         </tfoot>
     </table>
 </div>
+<script>
+    (function($) {
+        $(function() {
+            $('.composer-update-link').on('click', function(e) {
+                var l = $(this);
+                l.html('Please wait...').css('cursor', 'wait').blur();
+                var i = $('<img />').css('height', '10px').css('width', '10px').css('marginLeft', '3px').css('marginTop', '3px')
+                    .attr('src', '<?= site_url('/wp-includes/images/wpspin-2x.gif') ?>');
+                l.after(i);
+            });
+        })
+    }(jQuery));
+
+</script>

@@ -131,7 +131,7 @@ class Installer
                             b.after(i);                           
                         });
                     });
-                }(jQuery)());
+                }(jQuery));
                 </script>
             ";
         }

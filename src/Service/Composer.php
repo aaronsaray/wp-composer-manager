@@ -86,9 +86,6 @@ class Composer
      */
     public function runComposerUpdateForPlugin(Model\Plugin $plugin)
     {
-        // copy composer.lock file to the plugin dir
-        // run composer install
-        // if successful move composer.lock file back
         if (!copy(self::$COMPOSER_LOCK_FILE, $plugin->getPluginDirectory() . '/composer.lock')) {
             throw new \Exception('Unable to copy composer.lock file to plugin dir ' . $plugin->getPluginDirectory());
         }
