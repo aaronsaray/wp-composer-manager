@@ -82,30 +82,36 @@ class Composer
      */
     public function runComposerUpdateForPlugin(Model\Plugin $plugin)
     {
-        return true;
-//        if (!copy(self::$COMPOSER_LOCK_FILE, $plugin->getPluginDirectory() . '/composer.lock')) {
-//            throw new \Exception('Unable to copy composer.lock file to plugin dir ' . $plugin->getPluginDirectory());
-//        }
-//
-//        // need to do the merging here
-//
-//        $installCommand = sprintf(
-//            'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s update -d %s 2>&1',
-//            self::$COMPOSER_VENDOR_DIRECTORY,
-//            self::$COMPOSER_DIRECTORY,
-//            self::$COMPOSER_BINARY,
-//            $plugin->getPluginDirectory()
-//        );
-//
-//        exec($installCommand, $outputInstall, $returnVarInstall);
-//        if ($returnVarInstall !== 0) {
-//            throw new \Exception('Composer install failed with message: ' . implode(" ", $outputInstall));
-//        }
-//
-//        if (!rename($plugin->getPluginDirectory() . '/composer.lock', self::$COMPOSER_LOCK_FILE)) {
-//            throw new \Exception('Unable to move the composer.lock file after finishing installation.');
-//        }
-//
-//        return $outputInstall;
+        $baseComposerJson = json_decode(file_get_contents(self::$COMPOSER_DIRECTORY . '/composer.json'), true);
+        $pluginComposerJson = json_decode(file_get_contents($this->getComposerJsonFileFromPluginId($plugin->getId())), true);
+
+        if (isset($pluginComposerJson['autoload']['psr-4'])) {
+            foreach ($pluginComposerJson['autoload']['psr-4'] as $namespace => $value) {
+                $pluginComposerJson['autoload']['psr-4'][$namespace] = sprintf('../plugins/%s/%s', dirname($plugin->getId()), $value);
+            }
+
+            if (!isset($baseComposerJson['autoload']['psr-4'])) $baseComposerJson['autoload']['psr-4'] = array();
+            $baseComposerJson['autoload']['psr-4'] = array_merge($baseComposerJson['autoload']['psr-4'], $pluginComposerJson['autoload']['psr-4']);
+        }
+
+        if (!defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 128); // does nothing though...
+        if (!file_put_contents(self::$COMPOSER_DIRECTORY . '/composer.json', json_encode($baseComposerJson, JSON_PRETTY_PRINT))) {
+            throw new \Exception('Unable to write merged composer.json file.');
+        }
+
+        $installCommand = sprintf(
+            'COMPOSER_VENDOR_DIR=%s COMPOSER_HOME=%s %s install -d %s 2>&1',
+            self::$COMPOSER_VENDOR_DIRECTORY,
+            self::$COMPOSER_DIRECTORY,
+            self::$COMPOSER_BINARY,
+            self::$COMPOSER_DIRECTORY
+        );
+
+        exec($installCommand, $outputInstall, $returnVarInstall);
+        if ($returnVarInstall !== 0) {
+            throw new \Exception('Composer install failed with message: ' . implode(" ", $outputInstall));
+        }
+
+        return $outputInstall;
     }
 }

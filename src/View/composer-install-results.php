@@ -19,7 +19,7 @@
         echo '</ul>';
     }
     else {
-        echo '<p class="success-message">The <code>composer update</code> function was successful.</p>';
+        echo '<p class="success-message">The <code>composer install</code> function was successful.</p>';
         echo '<pre>' . implode("\n", $this->composerOutput) . '</pre>';
     }
     ?>
