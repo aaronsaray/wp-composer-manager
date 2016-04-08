@@ -12,7 +12,7 @@ WP Composer Manager is a tool to install composer dependencies in other plugins.
 
 **Alpha Version** This plugin is still under development and testing.
 
-[Composer](http://getcomposer.com) is a great tool for managing dependencies and third-party libraries in PHP.
+[Composer](http://getcomposer.org) is a great tool for managing dependencies and third-party libraries in PHP.
 As WordPress plugins become more complex, it may become necessary to import reusable code libraries into your
 plugin.  Using this plugin, a site owner can install plugin composer dependencies globally to their WordPress
 installation.
