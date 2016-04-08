@@ -87,6 +87,7 @@ class Composer
 
         $baseComposerJsonArray = $this->mergeAutoload($baseComposerJsonArray, $pluginComposerJsonArray, $plugin);
         $baseComposerJsonArray = $this->mergeRequire($baseComposerJsonArray, $pluginComposerJsonArray);
+        $baseComposerJsonArray = $this->mergeRepositories($baseComposerJsonArray, $pluginComposerJsonArray);
 
 
         if (!defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 128); // does nothing though...
@@ -145,6 +146,23 @@ class Composer
         if (isset($pluginComposerJsonArray['require'])) {
             if (!isset($baseComposerJsonArray['require'])) $baseComposerJsonArray['require'] = array(); //should never happen
             $baseComposerJsonArray['require'] = array_merge($baseComposerJsonArray['require'], $pluginComposerJsonArray['require']);
+        }
+
+        return $baseComposerJsonArray;
+    }
+
+    /**
+     * Merge in repositories
+     *
+     * @param $baseComposerJsonArray
+     * @param $pluginComposerJsonArray
+     * @return mixed
+     */
+    protected function mergeRepositories($baseComposerJsonArray, $pluginComposerJsonArray)
+    {
+        if (isset($pluginComposerJsonArray['repositories'])) {
+            if (!isset($baseComposerJsonArray['repositories'])) $baseComposerJsonArray['repositories'] = array();
+            $baseComposerJsonArray['repositories'] = array_merge($baseComposerJsonArray['repositories'], $pluginComposerJsonArray['repositories']);
         }
 
         return $baseComposerJsonArray;
