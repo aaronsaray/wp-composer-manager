@@ -153,7 +153,7 @@ class Installer
 
         if (!file_exists($composer::$COMPOSER_BINARY)) {
             if (!mkdir($composer::$COMPOSER_DIRECTORY)) {
-                throw new \Exception("We were unable to create directory " . $composer::$COMPOSER_DIRECTORY);
+                throw new \Exception("We were unable to create the composer directory " . $composer::$COMPOSER_DIRECTORY);
             }
 
             if (!ini_get('allow_url_fopen')) {

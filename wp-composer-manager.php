@@ -21,7 +21,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . WP_CONTENT_DIR . '/compos
 /** necessary because we want to set a good example */
 add_action('plugins_loaded', function() {
     if (stream_resolve_include_path('vendor/autoload.php')) {
-        require 'vendor/autoload.php';
+        require_once 'vendor/autoload.php';
         $app = new \AaronSaray\WPComposerManager\App();
     }
     else {
