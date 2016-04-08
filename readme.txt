@@ -96,7 +96,7 @@ Here is an example of how you can make your plugin compatible with WP Composer M
         else {
             // notify to install WP Composer Manager and configure it.
         }
-    }
+    });
 
 Basically, there are two parts.  First, determine if WP Composer Manager is installed and has been configured.  If that
 is successful, then determine if your specific class is available.  If it's not, one could generally assume that
