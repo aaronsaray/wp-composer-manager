@@ -29,6 +29,11 @@ class Plugin
     protected $description;
 
     /**
+     * @var boolean is this plugin active
+     */
+    protected $active;
+
+    /**
      * @return string
      */
     public function getId()
@@ -79,6 +84,24 @@ class Plugin
     public function setDescription($description)
     {
         $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param boolean $active
+     * @return Plugin
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
         return $this;
     }
 

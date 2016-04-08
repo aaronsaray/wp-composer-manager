@@ -24,8 +24,12 @@ class Plugin
         foreach (get_plugins() as $pluginFile => $pluginDetails) {
             $pluginDirectory = sprintf('%s/%s', WP_PLUGIN_DIR, plugin_dir_path($pluginFile));
             if (file_exists($pluginDirectory . 'composer.json')) {
+                $isActive = is_plugin_active($pluginFile);
                 $plugin = new Model\Plugin();
-                $plugin->setId($pluginFile)->setName($pluginDetails['Name'])->setDescription($pluginDetails['Description']);
+                $plugin->setId($pluginFile)
+                    ->setName($pluginDetails['Name'])
+                    ->setDescription($pluginDetails['Description'])
+                    ->setActive($isActive);
                 $plugins[] = $plugin;
             }
         }
