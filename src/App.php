@@ -100,26 +100,5 @@ class App
         add_action('admin_enqueue_scripts', function () {
             wp_enqueue_script('jquery');
         });
-
-        /**
-         * Add action to run composer update on their plugin
-         */
-        add_action('wp-composer-manager_run_composer_update', array($this, 'composerUpdateHook'));
-    }
-
-    /**
-     * This hook runs when other plugins request a composer update on themselves
-     * @param $pluginId
-     */
-    public function composerUpdateHook($pluginId)
-    {
-        if (validate_plugin($pluginId) === 0) {
-            $_GET['plugin'] = $pluginId; // not my favorite way of doing this but ...
-            $controller = $this->di['controller.composer-update'];
-            $controller();
-        }
-        else {
-            echo "<p>The plugin {$pluginId} is not available.</p>";
-        }
     }
 }

@@ -102,14 +102,14 @@ Basically, there are two parts.  First, determine if WP Composer Manager is inst
 is successful, then determine if your specific class is available.  If it's not, one could generally assume that
 the user hasn't ran the Composer Update function inside of WP Composer Manager for your plugin.
 
-**Using the Built-in Composer Update WordPress Action**
+**Using a Direct Link for Composer Update**
 
-This plugin also offers an action hook called `wp-composer-manager_run_composer_update` - this requires a parameter of
-your plugin's identifier or basename.  This hook will output the same output that running composer update on a plugin
-inside of the WP Composer Manager dashboard will.
+You can use a direct link to link directly to the composer update command for your plugin.  However, this may take a
+while so it is normally recommended just to send them to the WP Composer Manager dashboard.  But, if you prefer to handle
+your own UI and indicate that this may take a while, you can use the following code to generate a link to your plugin's
+composer update command.
 
-In your plugin, you might try using code like this:
+    $pluginId = plugin_basename(__FILE__); // this is done from your main plugin file
+    $url = admin_url('plugins.php?page=composer-manager-composer-update&plugin=' . $pluginId);
 
-    do_action('wp-composer-manager_run_composer_update', plugin_basename(__FILE__);
-
-Include this when you want to run the composer update command.
+This can be used in a link then to take the user directly to the composer update page.
