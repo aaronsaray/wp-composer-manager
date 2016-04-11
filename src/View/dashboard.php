@@ -50,7 +50,7 @@
             if (!$plugin->isActive()) echo " <small><strong>(inactive)</strong>";
             echo '</td>';
             echo '<td>' . esc_html($plugin->getDescription()) . '</td>';
-            echo '<td><a class="composer-update-link" href="plugins.php?page=composer-manager-composer-install&plugin=' . esc_html($plugin->getId()) . '">Composer Update</a></td>';
+            echo '<td><a class="composer-update-link" href="plugins.php?page=composer-manager-composer-update&plugin=' . esc_html($plugin->getId()) . '">Composer Update</a></td>';
             echo '</tr>';
         }
         ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * The Composer Install Controller
+ * The Composer Update Controller
  *
  * @author Aaron Saray
  */
@@ -8,10 +8,10 @@
 namespace AaronSaray\WPComposerManager\Controller;
 
 /**
- * Class ComposerInstall
+ * Class ComposerUpdate
  * @package AaronSaray\WPComposerManager\Controller
  */
-class ComposerInstall extends ControllerAbstract
+class ComposerUpdate extends ControllerAbstract
 {
     /**
      * Run the controller

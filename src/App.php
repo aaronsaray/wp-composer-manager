@@ -47,8 +47,8 @@ class App
         $di['controller.dashboard'] = function($di) {
             return new Controller\Dashboard($di['view'], $di['service.plugin'], $di['service.composer']);
         };
-        $di['controller.composer-install'] = function($di) {
-            return new Controller\ComposerInstall($di['view'], $di['service.plugin'], $di['service.composer']);
+        $di['controller.composer-update'] = function($di) {
+            return new Controller\ComposerUpdate($di['view'], $di['service.plugin'], $di['service.composer']);
         };
     }
 
@@ -71,14 +71,14 @@ class App
                 $di['controller.dashboard']
             );
 
-            /** composer install page */
+            /** composer update page */
             add_submenu_page(
                 null,
-                __('Composer Install', 'wp-composer-manager'),
+                __('Composer Update', 'wp-composer-manager'),
                 null,
                 'manage_options',
-                'composer-manager-composer-install',
-                $di['controller.composer-install']
+                'composer-manager-composer-update',
+                $di['controller.composer-update']
             );
         });
 
@@ -100,5 +100,26 @@ class App
         add_action('admin_enqueue_scripts', function () {
             wp_enqueue_script('jquery');
         });
+
+        /**
+         * Add action to run composer update on their plugin
+         */
+        add_action('wp-composer-manager_run_composer_update', array($this, 'composerUpdateHook'));
+    }
+
+    /**
+     * This hook runs when other plugins request a composer update on themselves
+     * @param $pluginId
+     */
+    public function composerUpdateHook($pluginId)
+    {
+        if (validate_plugin($pluginId) === 0) {
+            $_GET['plugin'] = $pluginId; // not my favorite way of doing this but ...
+            $controller = $this->di['controller.composer-update'];
+            $controller();
+        }
+        else {
+            echo "<p>The plugin {$pluginId} is not available.</p>";
+        }
     }
 }

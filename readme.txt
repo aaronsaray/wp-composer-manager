@@ -76,7 +76,7 @@ to have the parent directory of `vendor` as part of the include path.  Your plug
 path/file of `vendor/autoload.php` in order to access the autoloader.  Since we can't necessarily guarantee what order
 plugins are loaded, your plugin should now execute its primary logic from the hook [plugins_loaded](https://codex.wordpress.org/Plugin_API/Action_Reference/plugins_loaded).
 
-**Sample Code for Your Plugin**
+**Sample Launch Code for Your Plugin**
 
 Here is an example of how you can make your plugin compatible with WP Composer Manager.
 
@@ -101,3 +101,15 @@ Here is an example of how you can make your plugin compatible with WP Composer M
 Basically, there are two parts.  First, determine if WP Composer Manager is installed and has been configured.  If that
 is successful, then determine if your specific class is available.  If it's not, one could generally assume that
 the user hasn't ran the Composer Update function inside of WP Composer Manager for your plugin.
+
+**Using the Built-in Composer Update WordPress Action**
+
+This plugin also offers an action hook called `wp-composer-manager_run_composer_update` - this requires a parameter of
+your plugin's identifier or basename.  This hook will output the same output that running composer update on a plugin
+inside of the WP Composer Manager dashboard will.
+
+In your plugin, you might try using code like this:
+
+    do_action('wp-composer-manager_run_composer_update', plugin_basename(__FILE__);
+
+Include this when you want to run the composer update command.
