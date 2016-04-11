@@ -37,7 +37,7 @@ class ComposerUpdate extends ControllerAbstract
             $errors[] = $e->getMessage();
         }
 
-        $this->view->setView('composer-install-results');
+        $this->view->setView('composer-update-results');
         $this->view->setData(array(
             'plugin'    =>  $plugin,
             'errors' => $errors,
